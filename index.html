@@ -1,13 +1,405 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediafy - YouTube-Powered Client Acquisition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5659FF;       /* Original purple */
+            --primary-dark: #4346CC;
+            --youtube-red: #FF0000;    
+            --background: #0a0a0a;    
+            --surface: #171717;       
+            --text: #f8fafc;          
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        /* Fixed Navigation */
+        header {
+            padding: 1rem 5%;
+            background: rgba(10, 10, 10, 0.98);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(86,89,255,0.1);
+            color: var(--primary);
+        }
+
+        .hero {
+            padding: 8rem 5% 4rem;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--background) 0%, #111 100%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero h1 .highlight {
+            color: var(--primary);
+        }
+
+        .vsl-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 3rem auto;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .vsl-container video {
+            width: 100%;
+            height: 450px;
+            background: #000;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 1.25rem 3rem;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: var(--text);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(86,89,255,0.3);
+        }
+
+        .section {
+            padding: 6rem 5%;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Testimonials Grid */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .testimonial-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Client Proof Section */
+        .client-proof {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .client-stat {
+            text-align: center;
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Improved Production Showcase */
+        .production-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .production-card {
+            background: var(--surface);
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .production-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .production-card::before {
+            content: "▶";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: var(--text);
+            opacity: 0.8;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Calendly Integration */
+        .calendly-section {
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 1rem;
+        }
+
+        .calendly-inline-widget {
+            height: 700px;
+            width: 100%;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        /* Social Links Fix */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .social-links a {
+            color: var(--text);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+
+        .social-links .youtube {
+            color: var(--youtube-red);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+                padding: 0.5rem;
+            }
+
+            .vsl-container video {
+                height: 300px;
+            }
+
+            .calendly-inline-widget {
+                height: 600px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none; /* Add hamburger menu here */
+            }
+
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .social-links {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Mediafy</div>
+        <nav class="nav-links">
+            <a href="#results">Results</a>
+            <a href="#process">Process</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Generate 5-10 High-Ticket Clients<br> 
+            <span class="highlight">In 30 Days</span> Through 
+            <span style="color: var(--youtube-red)">YouTube</span>
+        </h1>
+        <p>For B2B agency owners, high-ticket coaches, and info product sellers</p>
+        
+        <div class="vsl-container">
+            <video controls poster="vsl-thumbnail.jpg">
+                <source src="sales-video.mp4" type="video/mp4">
+            </video>
+            <p style="text-align: center; margin: 1rem 0; color: var(--primary)">Tap Play to Watch Full Strategy Breakdown →</p>
+        </div>
+
+        <a href="#booking" class="cta-button">
+            <i class="fas fa-calendar-check"></i>
+            Schedule Free Demo
+        </a>
+    </section>
+
+    <section class="section" id="results">
+        <div class="section-header">
+            <h2>Proven Results for Elite Performers</h2>
+            <p>Trusted by industry leaders to deliver consistent client flow</p>
+        </div>
+
+        <div class="client-proof">
+            <div class="client-stat">
+                <div class="stat-number">2,000+</div>
+                <p>Businesses Transformed</p>
+            </div>
+            <div class="client-stat">
+                <div class="stat-number">$1.2B+</div>
+                <p>Revenue Generated</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="testimonials">
+        <div class="section-header">
+            <h2>What Industry Leaders Say</h2>
+        </div>
+        
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <img src="ryan-dice.jpg" alt="Ryan Dice" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary)">
+                <h3>"Tripled our qualified leads in 30 days"</h3>
+                <p>- Ryan Dice</p>
+            </div>
+            <!-- Add more testimonials -->
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>The 1% Secret They're Hiding</h2>
+            <p>Used by Alex Hormozi, Charlie Morgan, and other top performers</p>
+        </div>
+        <div class="testimonial-card" style="max-width: 800px; margin: 0 auto;">
+            <p>"99% of business owners neglect personal branding, putting them at severe disadvantage against competitors with strong brand presence. Attention is the new currency - control it or lose to those who do."</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>Our Production Quality</h2>
+            <p>Studio-grade videos and thumbnails that convert</p>
+        </div>
+        
+        <div class="production-showcase">
+            <div class="production-card">
+                <video muted loop class="production-preview"></video>
+            </div>
+            <div class="production-card">
+                <video muted loop class="production-preview"></video>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="booking">
+        <div class="section-header">
+            <h2>Claim Your Free Growth Audit</h2>
+            <p>Get your personalized roadmap to 5-10 new sales calls/month</p>
+        </div>
+        <div class="calendly-section">
+            <div class="calendly-inline-widget" 
+                 data-url="https://calendly.com/your-link" 
+                 style="min-width:320px;height:700px;"></div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="social-links">
+            <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p>&copy; 2024 Mediafy. All rights reserved.</p>
+    </footer>
+
+    <!-- Calendly Script -->
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+</body>
 </html>
